@@ -18,7 +18,7 @@ router.post('/send-otp', async (req, res) => {
     }
 
     // Send OTP (stores in memory and logs to console)
-    const result = sendOtp(mobile.trim());
+    const result = await sendOtp(mobile.trim());
 
     if (result.success) {
       return res.status(200).json({

@@ -147,13 +147,11 @@ if (process.env.NODE_ENV !== 'test') {
       seedWorkTypes();
 
       // Initialize Firebase Admin SDK (require lazily so tests can mock the module)
-      if (config.enableSocketIO || config.enableMockOrders) {
-        try {
-          const { initializeFirebase } = require('./config/firebase');
-          initializeFirebase();
-        } catch (e) {
-          console.warn('Firebase initialization skipped or failed:', e.message);
-        }
+      try {
+        const { initializeFirebase } = require('./config/firebase');
+        initializeFirebase();
+      } catch (e) {
+        console.warn('Firebase initialization skipped or failed:', e.message);
       }
     })
     .catch((error) => {
