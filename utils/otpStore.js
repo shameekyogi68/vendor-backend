@@ -32,11 +32,11 @@ function generateOTP() {
 
 /**
  * Send OTP (dev-only: stores in memory and logs to console)
- * Also sends push notification if vendor has FCM tokens
+ * Also sends push notification if vendor has FCM tokens (non-blocking)
  * @param {string} mobile - Mobile number
  * @returns {object} - { success: boolean, code: string (dev-only) }
  */
-async function sendOtp(mobile) {
+function sendOtp(mobile) {
   const code = generateOTP();
   const expiresAt = Date.now() + config.otpExpiry;
 
@@ -45,14 +45,15 @@ async function sendOtp(mobile) {
   // Log OTP to console for development
   console.log(`[OTP] Generated for ${mobile}: ${code} (expires in ${config.otpExpiry / 1000}s)`);
 
-  // Try to send push notification
-  try {
-    const Vendor = require('../models/vendor');
-    const vendor = await Vendor.findOne({ mobile });
-    
-    if (vendor && vendor.fcmTokens && vendor.fcmTokens.length > 0) {
-      const { sendPushToVendor } = require('../services/notificationService');
-      console.log(`[OTP] Attempting to send push notification to vendor ${vendor._id}`);
+  // Try to send push notification (non-blocking)
+  setImmediate(async () => {
+    try {
+      const Vendor = require('../models/vendor');
+      const vendor = await Vendor.findOne({ mobile });
+      
+      if (vendor && vendor.fcmTokens && vendor.fcmTokens.length > 0) {
+        const { sendPushToVendor } = require('../services/notificationService');
+        console.log(`[OTP] Attempting to send push notification to vendor ${vendor._id}`);
       
       const result = await sendPushToVendor(
         vendor._id,
@@ -69,16 +70,17 @@ async function sendOtp(mobile) {
       
       if (result.success) {
         console.log(`[OTP] Push notification sent successfully to ${vendor.mobile}`);
+        } else {
+          console.log(`[OTP] Push notification failed: ${result.error}`);
+        }
       } else {
-        console.log(`[OTP] Push notification failed: ${result.error}`);
+        console.log(`[OTP] No FCM tokens found for ${mobile}, skipping push notification`);
       }
-    } else {
-      console.log(`[OTP] No FCM tokens found for ${mobile}, skipping push notification`);
+    } catch (error) {
+      console.error(`[OTP] Error sending push notification:`, error.message);
+      // Continue even if push notification fails
     }
-  } catch (error) {
-    console.error(`[OTP] Error sending push notification:`, error.message);
-    // Continue even if push notification fails
-  }
+  });
 
   return { success: true, code }; // Return code for dev/testing
 }
