@@ -9,30 +9,44 @@ const Vendor = require('../models/vendor');
  * Send OTP to mobile number (dev-only: in-memory storage)
  */
 router.post('/send-otp', async (req, res) => {
+  console.log('[AUTH] Received send-otp request');
+  console.log('[AUTH] Request body:', req.body);
+  
   try {
     const { mobile } = req.body;
 
     // Validate mobile
     if (!mobile || typeof mobile !== 'string' || mobile.trim() === '') {
+      console.log('[AUTH] Validation failed: mobile number missing or invalid');
       return res.status(400).json({ message: 'Mobile number is required' });
     }
 
+    console.log(`[AUTH] Sending OTP to mobile: ${mobile.trim()}`);
+    
     // Send OTP (stores in memory and logs to console)
     const result = sendOtp(mobile.trim());
 
+    console.log('[AUTH] OTP generation result:', result);
+
     if (result.success) {
+      console.log(`[AUTH] OTP sent successfully for ${mobile.trim()}, code: ${result.code}`);
       return res.status(200).json({
-        message: 'OTP sent (dev-only)',
-        // Optionally include OTP in response for dev/testing
-        // Remove this in production when using real SMS provider
-        ...(process.env.NODE_ENV !== 'production' && { otp: result.code }),
+        success: true,
+        message: 'OTP sent successfully',
+        otp: result.code, // Always return OTP for testing
       });
     }
 
+    console.log('[AUTH] OTP generation failed');
     return res.status(500).json({ message: 'Failed to send OTP' });
   } catch (error) {
-    console.error('Send OTP error:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('[AUTH] Send OTP error:', error);
+    console.error('[AUTH] Error stack:', error.stack);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: error.message 
+    });
   }
 });
 
