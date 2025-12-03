@@ -153,9 +153,23 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV !== 'test') {
   mongoose
     .connect(config.mongoUri)
-    .then(() => {
+    .then(async () => {
       console.log('Connected to MongoDB');
       console.log(`Database: ${config.mongoUri}`);
+      
+      // Drop problematic vendorId index if it exists
+      try {
+        const collection = mongoose.connection.db.collection('vendors');
+        await collection.dropIndex('vendorId_1');
+        console.log('✅ Dropped vendorId_1 index');
+      } catch (error) {
+        if (error.code === 27 || error.message?.includes('index not found')) {
+          console.log('✅ vendorId_1 index does not exist');
+        } else {
+          console.warn('⚠️  Could not drop vendorId_1 index:', error.message);
+        }
+      }
+      
       // Seed work types if database is empty
       seedWorkTypes();
 

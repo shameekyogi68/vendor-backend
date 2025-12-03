@@ -395,7 +395,25 @@ async function registerFCMToken(req, res) {
       });
     }
 
-    const vendor = req.user;
+    let vendor;
+    
+    // Check if user is pre-registration (only has mobile, not vendorId)
+    if (req.user.isPreRegistration) {
+      // Find or create vendor by mobile
+      vendor = await Vendor.findOne({ mobile: req.user.mobile });
+      
+      if (!vendor) {
+        // Create a minimal vendor profile for FCM token storage
+        vendor = new Vendor({
+          mobile: req.user.mobile,
+          mobileVerified: true,
+          vendorName: `Vendor ${req.user.mobile}`, // Temporary name
+          fcmTokens: [],
+        });
+      }
+    } else {
+      vendor = req.user;
+    }
 
     // Initialize fcmTokens array if it doesn't exist
     if (!vendor.fcmTokens) {
