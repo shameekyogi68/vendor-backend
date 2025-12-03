@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: vendor-backend-server
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: ENABLE_MOCK_ORDERS
+        value: false
+      - key: MOCK_ORDERS_SECRET
+        sync: false
+      - key: INTERNAL_API_KEY
+        generateValue: true
+      - key: SERVICE_API_KEY
+        generateValue: true
+      - key: ENABLE_SOCKET_IO
+        value: true
+      - key: ENABLE_WORK_TYPES
+        value: true
+      - key: SOCKET_CORS_ORIGIN
+        value: "*"
+      - key: PRESENCE_TTL_SECONDS
+        value: 90
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
