@@ -397,6 +397,11 @@ async function registerFCMToken(req, res) {
 
     const vendor = req.user;
 
+    // Initialize fcmTokens array if it doesn't exist
+    if (!vendor.fcmTokens) {
+      vendor.fcmTokens = [];
+    }
+
     // Check if token already exists
     const existingTokenIndex = vendor.fcmTokens.findIndex(t => t.token === token);
 

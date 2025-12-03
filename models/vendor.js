@@ -55,25 +55,28 @@ const vendorSchema = new mongoose.Schema(
       },
     },
     // FCM tokens for push notifications
-    fcmTokens: [{
-      token: {
-        type: String,
-        required: true,
-      },
-      deviceId: {
-        type: String,
-        default: null,
-      },
-      platform: {
-        type: String,
-        enum: ['android', 'ios', 'web'],
-        default: 'android',
-      },
-      lastUsed: {
-        type: Date,
-        default: Date.now,
-      },
-    }],
+    fcmTokens: {
+      type: [{
+        token: {
+          type: String,
+          required: true,
+        },
+        deviceId: {
+          type: String,
+          default: null,
+        },
+        platform: {
+          type: String,
+          enum: ['android', 'ios', 'web'],
+          default: 'android',
+        },
+        lastUsed: {
+          type: Date,
+          default: Date.now,
+        },
+      }],
+      default: [],
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
@@ -82,7 +85,6 @@ const vendorSchema = new mongoose.Schema(
 
 // Indexes for performance
 vendorSchema.index({ mobile: 1 }, { unique: true });
-vendorSchema.index({ businessType: 1 });
 vendorSchema.index({ 'fcmTokens.token': 1 });
 
 // Method to get public vendor data (exclude sensitive fields if needed)
