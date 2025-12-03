@@ -310,12 +310,34 @@ async function createVendor(req, res) {
       });
     }
 
-    // Check if vendor already exists
-    const existingVendor = await Vendor.findOne({ mobile: mobile.trim() });
+    // Check if vendor already exists - if yes, update it instead
+    let existingVendor = await Vendor.findOne({ mobile: mobile.trim() });
     if (existingVendor) {
-      return res.status(409).json({ 
-        ok: false,
-        error: 'Vendor with this mobile number already exists' 
+      // Update existing vendor with new details
+      existingVendor.vendorName = sanitizeString(vendorName);
+      existingVendor.gender = normalizeGender(gender);
+      existingVendor.businessName = sanitizeString(businessName || '');
+      existingVendor.businessAddress = sanitizeString(businessAddress || '');
+      existingVendor.businessType = sanitizeString(businessType || '');
+      existingVendor.availabilityMode = availabilityMode || '';
+      existingVendor.selectedServices = parseSelectedServices(selectedServices);
+      existingVendor.mobileVerified = true;
+      
+      // Update identity images if provided
+      const identityImages = getFilePaths(req.files || {});
+      if (identityImages.profile) existingVendor.identityImages.profile = identityImages.profile;
+      if (identityImages.id) existingVendor.identityImages.id = identityImages.id;
+      if (identityImages.cert) existingVendor.identityImages.cert = identityImages.cert;
+      
+      await existingVendor.save();
+      
+      const token = signToken({ vendorId: existingVendor._id, mobile: existingVendor.mobile });
+      
+      return res.status(200).json({
+        ok: true,
+        message: 'Vendor profile updated successfully',
+        token,
+        vendor: existingVendor.toPublicJSON(),
       });
     }
 
