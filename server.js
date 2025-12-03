@@ -57,6 +57,19 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
+// Request logging middleware - logs ALL incoming requests (AFTER body parsing)
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`\n========================================`);
+  console.log(`[${timestamp}] ${req.method} ${req.url}`);
+  console.log(`[REQUEST] IP: ${req.ip}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`[REQUEST] Body:`, JSON.stringify(req.body, null, 2));
+  }
+  console.log(`========================================\n`);
+  next();
+});
+
 // Static file serving for uploads
 // Files will be accessible at http://localhost:PORT/uploads/filename
 app.use('/uploads', express.static(uploadsPath));
