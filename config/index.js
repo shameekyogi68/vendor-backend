@@ -41,4 +41,7 @@ module.exports = {
   firebaseServiceAccount: process.env.FIREBASE_SERVICE_ACCOUNT || '',
   firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY || '',
   firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+  
+  // Customer backend URL for server-to-server communication
+  customerBackendUrl: process.env.CUSTOMER_BACKEND_URL || 'https://convenzcusb-backend.onrender.com',
 };

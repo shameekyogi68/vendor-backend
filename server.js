@@ -18,6 +18,8 @@ const orderRoutes = require('./routes/orders');
 const ordersFetchListRoutes = require('./routes/ordersFetchList');
 const earningsRoutes = require('./routes/earnings');
 const proxyRoutes = require('./routes/proxy');
+const vendorAuthRoutes = require('./routes/vendorAuth');
+const vendorBookingRoutes = require('./routes/vendorBooking');
 const { seedWorkTypes } = require('./controllers/workTypesController');
 
 // Initialize Express app
@@ -93,6 +95,10 @@ app.use('/api/vendor/bookings', require('./routes/booking')); // Also mount at /
 // Vendor location endpoint mounted at /api/vendor/location
 app.use('/api/vendor', vendorLocationRoutes);
 
+// NEW: Vendor-specific routes (separate from /api/*)
+app.use('/vendor', vendorAuthRoutes); // Vendor auth: /vendor/register, /vendor/verify-otp, /vendor/update-fcm-token, /vendor/update-location
+app.use('/vendor', vendorBookingRoutes); // Vendor bookings: /vendor/api/new-booking, /vendor/booking/update-status
+
 // Conditionally mount dev/mock endpoints (only when ENABLE_MOCK_ORDERS=true)
 if (config.enableMockOrders) {
   console.log('⚠️  Mock order endpoint enabled (ENABLE_MOCK_ORDERS=true)');
@@ -118,8 +124,16 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'Vendor Backend API',
-    version: '1.0.2',
+    version: '2.0.0',
     endpoints: {
+      vendor: {
+        register: 'POST /vendor/register',
+        verifyOtp: 'POST /vendor/verify-otp',
+        updateFcmToken: 'POST /vendor/update-fcm-token',
+        updateLocation: 'POST /vendor/update-location',
+        newBooking: 'POST /vendor/api/new-booking (server-to-server)',
+        updateBookingStatus: 'POST /vendor/booking/update-status',
+      },
       auth: {
         sendOtp: 'POST /api/auth/send-otp',
         verifyOtp: 'POST /api/auth/verify-otp',
@@ -128,6 +142,13 @@ app.get('/', (req, res) => {
         create: 'POST /api/vendors',
         getMe: 'GET /api/vendors/me',
         updateMe: 'PATCH /api/vendors/me'
+      },
+      bookings: {
+        accept: 'POST /api/booking/accept',
+        reject: 'POST /api/booking/reject',
+        start: 'POST /api/booking/start',
+        complete: 'POST /api/booking/complete',
+        pending: 'GET /api/vendor/bookings/pending',
       },
       workTypes: {
         getAll: 'GET /api/work-types',
