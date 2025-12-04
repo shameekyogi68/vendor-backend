@@ -89,6 +89,7 @@ app.use('/api/orders', orderRoutes); // Order management routes
 app.use('/api/earnings', earningsRoutes); // Earnings endpoints
 app.use('/api/proxy', proxyRoutes); // Backend-to-backend proxy endpoints
 app.use('/api/booking', require('./routes/booking')); // Vendor booking action routes
+app.use('/api/vendor/bookings', require('./routes/booking')); // Also mount at /api/vendor/bookings for pending endpoint
 // Vendor location endpoint mounted at /api/vendor/location
 app.use('/api/vendor', vendorLocationRoutes);
 

@@ -314,9 +314,44 @@ async function getVendorBookings(req, res) {
   }
 }
 
+/**
+ * GET /api/vendor/bookings/pending
+ * Get pending bookings filtered by service type
+ * Query params: service (optional)
+ */
+async function getPendingBookings(req, res) {
+  try {
+    const { service } = req.query;
+
+    const query = { status: 'pending' };
+    if (service) {
+      query.serviceType = service;
+    }
+
+    const bookings = await Booking.find(query)
+      .populate('vendorId', 'name phone serviceTypes')
+      .sort({ createdAt: -1 });
+
+    console.log(`[BOOKING] Fetched ${bookings.length} pending bookings${service ? ` for service: ${service}` : ''}`);
+
+    return res.status(200).json({
+      ok: true,
+      bookings,
+    });
+  } catch (error) {
+    console.error('[BOOKING] Get pending bookings error:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'Failed to fetch pending bookings',
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   updateBookingStatus,
   startJob,
   completeJob,
   getVendorBookings,
+  getPendingBookings,
 };

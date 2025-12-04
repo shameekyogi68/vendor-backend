@@ -8,6 +8,9 @@ const { authenticate } = require('../middleware/auth');
  * All routes require authentication
  */
 
+// Get pending bookings (filtered by service type)
+router.get('/pending', authenticate, bookingController.getPendingBookings);
+
 // Update booking status (accept/reject)
 router.patch('/update-status', authenticate, bookingController.updateBookingStatus);
 
