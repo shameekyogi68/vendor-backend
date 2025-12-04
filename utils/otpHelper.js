@@ -10,6 +10,14 @@ function generateOTP() {
 }
 
 /**
+ * Generate a random 4-digit OTP for job start verification
+ * @returns {string} 4-digit OTP code
+ */
+function generateJobOTP() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+/**
  * Hash an OTP code using bcrypt
  * @param {string} code - OTP code to hash
  * @returns {Promise<string>} Hashed OTP
@@ -82,6 +90,7 @@ function hasTooManyAttempts(otp, maxAttempts = 5) {
 }
 
 module.exports = {
+  generateJobOTP,
   generateOTP,
   hashOTP,
   verifyOTP,
