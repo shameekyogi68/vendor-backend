@@ -1,56 +1,137 @@
-# Vendor Backend Server
+# Vendor Backend Server v2.0.0
 
-A flexible, modular Node.js/Express backend for vendor management with MongoDB, JWT authentication, OTP verification, and local file uploads. Designed to be integrated into existing projects with easy extensibility.
+A complete, production-ready Node.js/Express backend for vendor management in a service-booking platform. Features server-to-server communication with customer backend, Firebase Cloud Messaging, GPS location tracking, and comprehensive booking management.
 
-## Features
+## 🚀 Live Deployment
 
-- ✅ **MongoDB** with Mongoose ODM
+**Production URL:** https://vendor-backend-7cn3.onrender.com  
+**Status:** ✅ Live and Running  
+**Customer Backend:** https://convenzcusb-backend.onrender.com
+
+## ✨ Features
+
+### v2.0.0 - NEW Vendor-Specific Endpoints
+- ✅ **Vendor Registration** with OTP verification
+- ✅ **JWT Token Authentication** for secure API access
+- ✅ **FCM Token Management** for push notifications
+- ✅ **GPS Location Tracking** with GeoJSON support
+- ✅ **Server-to-Server Booking API** (called by customer backend)
+- ✅ **Booking Status Updates** with automatic customer backend notification
+- ✅ **Retry Logic** for customer backend communication (3 attempts)
+
+### Core Features
+- ✅ **MongoDB Atlas** with Mongoose ODM
 - ✅ **JWT Authentication** with Bearer tokens
-- ✅ **OTP Verification** (4-digit, in-memory for dev)
-- ✅ **File Uploads** using Multer (local storage, extensible to S3/GCS)
-- ✅ **Modular Architecture** (routes, models, middleware, utils)
-- ✅ **RESTful API** with JSON responses
-- ✅ **CORS Enabled**
+- ✅ **OTP Verification** (4-digit, 5-minute expiry)
+- ✅ **Firebase Cloud Messaging** for push notifications
+- ✅ **File Uploads** using Multer (local storage)
+- ✅ **Modular Architecture** (routes, models, middleware, services, utils)
+- ✅ **RESTful API** with comprehensive error handling
+- ✅ **CORS Enabled** for cross-origin requests
 - ✅ **Environment Configuration** via `.env`
+- ✅ **Comprehensive Logging** for debugging
+- ✅ **Health Check Endpoint** for monitoring
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Runtime**: Node.js >= 16.0.0
 - **Framework**: Express.js
-- **Database**: MongoDB + Mongoose
+- **Database**: MongoDB Atlas (Database: Convenz)
 - **Authentication**: JWT (jsonwebtoken)
+- **Push Notifications**: Firebase Admin SDK
 - **File Upload**: Multer
+- **HTTP Client**: axios (for server-to-server communication)
 - **Environment**: dotenv
+- **Deployment**: Render.com (auto-deploy on push)
 
-## Project Structure
+## 📚 Documentation
+
+- **[VENDOR_API_DOCUMENTATION.md](VENDOR_API_DOCUMENTATION.md)** - Complete API reference with examples
+- **[DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md)** - Deployment details and checklist
+- **[structure_server/Server_v3.md](structure_server/Server_v3.md)** - Server architecture
+- **[test-vendor-api.sh](test-vendor-api.sh)** - Automated test script
+
+## 📁 Project Structure
 
 ```
-backend_server/
+vendor-backend/
 ├── config/
-│   └── index.js           # Environment configuration
+│   ├── firebase.js         # Firebase Admin SDK configuration
+│   └── index.js            # Environment configuration
+├── controllers/
+│   ├── devOrdersController.js
+│   ├── earningsController.js
+│   ├── orderController.js
+│   ├── ordersController.js
+│   ├── presenceController.js
+│   ├── vendorController.js
+│   └── workTypesController.js
 ├── middleware/
-│   ├── auth.js            # JWT authentication middleware
-│   └── upload.js          # Multer file upload configuration
+│   ├── auth.js             # JWT authentication middleware
+│   ├── rateLimiter.js      # Rate limiting
+│   ├── requestId.js        # Request ID tracking
+│   ├── serviceAuth.js      # Service-to-service auth
+│   └── upload.js           # Multer file upload
 ├── models/
-│   └── vendor.js          # Mongoose Vendor schema
+│   ├── booking.js          # 🆕 Booking schema with OTP
+│   ├── order.js
+│   ├── vendor.js           # Vendor schema with FCM tokens
+│   ├── vendorLocation.js   # 🆕 GPS location tracking (GeoJSON)
+│   ├── vendorPresence.js
+│   └── workType.js
 ├── routes/
-│   ├── auth.js            # OTP send/verify endpoints
-│   └── vendors.js         # Vendor CRUD endpoints
+│   ├── auth.js             # OTP authentication
+│   ├── booking.js          # Booking management (legacy)
+│   ├── devOrders.js        # Dev/mock endpoints
+│   ├── earnings.js
+│   ├── orders.js
+│   ├── ordersFetchList.js
+│   ├── presence.js
+│   ├── proxy.js
+│   ├── vendorAuth.js       # 🆕 NEW: Vendor registration & auth
+│   ├── vendorBooking.js    # 🆕 NEW: Server-to-server booking API
+│   ├── vendorLocation.js
+│   ├── vendors.js
+│   └── workTypes.js
+├── services/
+│   ├── customerBackendService.js  # 🆕 NEW: Customer backend integration
+│   ├── devOrdersService.js
+│   ├── earningsService.js
+│   ├── notificationService.js
+│   ├── orderService.js
+│   ├── ordersService.js
+│   └── socketService.js
+├── structure_server/
+│   ├── API_details.md
+│   └── Server_v3.md
+├── tests/
+│   ├── *.test.js           # Jest test suites
+│   └── setup.js
+├── uploads/                # Local file storage
 ├── utils/
-│   ├── jwt.js             # JWT sign/verify helpers
-│   └── otpStore.js        # In-memory OTP storage (dev-only)
-├── uploads/               # Local file storage (auto-created)
-├── .env.example           # Environment variables template
-├── package.json           # Dependencies and scripts
-├── server.js              # Main application entry point
-└── README.md              # This file
+│   ├── jwt.js              # JWT helpers
+│   ├── logger.js
+│   ├── otpHelper.js        # OTP generation
+│   ├── otpStore.js         # In-memory OTP storage
+│   ├── payment.js
+├── DEPLOYMENT_SUMMARY.md   # 🆕 Deployment guide
+├── VENDOR_API_DOCUMENTATION.md  # 🆕 Complete API docs
+├── test-vendor-api.sh      # 🆕 Test script
+├── .env                    # Environment variables (not in git)
+├── .gitignore
+├── package.json
+├── server.js               # Main entry point
+└── README.md               # This file
 ```
 
-## Installation
+## 🚀 Quick Start
 
-### 1. Clone or Copy Files
+### 1. Clone Repository
 
-Copy this backend server directory into your project.
+```bash
+git clone https://github.com/shameekyogi68/vendor-backend.git
+cd vendor-backend
+```
 
 ### 2. Install Dependencies
 
@@ -60,89 +141,223 @@ npm install
 
 ### 3. Configure Environment
 
-Copy `.env.example` to `.env` and configure your settings:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
+Create `.env` file with required variables:
 
 ```env
 PORT=3000
-MONGO_URI=mongodb://localhost:27017/vendor-db
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/Convenz
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
+CUSTOMER_BACKEND_URL=https://convenzcusb-backend.onrender.com
+
+# Firebase Configuration
+FIREBASE_PROJECT_ID=convenz-customer-dfce7
+FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@convenz-customer-dfce7.iam.gserviceaccount.com
+
+# Optional
 UPLOAD_DIR=uploads
+ENABLE_WORK_TYPES=false
+ENABLE_MOCK_ORDERS=false
 ```
 
-### 4. Start MongoDB
-
-Ensure MongoDB is running locally or use a cloud MongoDB service (MongoDB Atlas).
+### 4. Start Server
 
 ```bash
-# If using local MongoDB
-mongod
-```
-
-### 5. Run the Server
-
-**Development mode** (with auto-restart):
-
-```bash
+# Development
 npm run dev
-```
 
-**Production mode**:
-
-```bash
+# Production
 npm start
 ```
 
-Server will start at `http://localhost:3000`
-
-## API Endpoints
-
-### Authentication
-
-#### 1. Send OTP
-
-Send a 4-digit OTP to a mobile number (dev-only: logged to console).
+### 5. Test API
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/send-otp \
+# Test all endpoints
+./test-vendor-api.sh http://localhost:3000
+
+# Or test individual endpoints
+curl http://localhost:3000/health
+```
+
+Server runs on: http://localhost:3000
+
+## 🆕 NEW API Endpoints (v2.0.0)
+
+### Vendor Registration & Authentication
+
+#### 1. Register Vendor
+```bash
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/register \
   -H "Content-Type: application/json" \
-  -d "{\"mobile\": \"1234567890\"}"
+  -d '{"mobile": "+919876543210", "vendorName": "John Plumber"}'
 ```
 
 **Response:**
 ```json
 {
-  "message": "OTP sent (dev-only)",
-  "otp": "1234"
+  "ok": true,
+  "message": "OTP sent successfully",
+  "vendorId": "693129888a756180b1d3c6fc",
+  "otp": "5818"
 }
 ```
 
 #### 2. Verify OTP
-
-Verify the OTP code and receive a JWT token.
-
 ```bash
-curl -X POST http://localhost:3000/api/auth/verify-otp \
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/verify-otp \
   -H "Content-Type: application/json" \
-  -d "{\"mobile\": \"1234567890\", \"code\": \"1234\"}"
+  -d '{"mobile": "+919876543210", "otp": "5818"}'
 ```
 
-**Response (existing vendor):**
+**Response:**
 ```json
 {
-  "message": "verified",
+  "ok": true,
+  "message": "OTP verified successfully",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "vendorId": "507f1f77bcf86cd799439011",
-  "vendor": { ... }
+  "vendor": {
+    "_id": "693129888a756180b1d3c6fc",
+    "mobile": "+919876543210",
+    "vendorName": "John Plumber",
+    "mobileVerified": true
+  }
 }
 ```
 
-**Response (new user):**
+#### 3. Update FCM Token
+```bash
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/update-fcm-token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vendorId": "693129888a756180b1d3c6fc",
+    "fcmToken": "fKj8fj3k4jf9sdf...",
+    "platform": "android"
+  }'
+```
+
+#### 4. Update Location
+```bash
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/update-location \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vendorId": "693129888a756180b1d3c6fc",
+    "lat": 37.7749,
+    "lng": -122.4194
+  }'
+```
+
+### Booking Management (Server-to-Server)
+
+#### 5. Create New Booking (Customer Backend → Vendor Backend)
+```bash
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/api/new-booking \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bookingId": "BK123456",
+    "customerId": "CUST001",
+    "vendorId": "693129888a756180b1d3c6fc",
+    "serviceType": "plumbing",
+    "amount": 500
+  }'
+```
+
+#### 6. Update Booking Status (Vendor → Customer Backend)
+```bash
+curl -X POST https://vendor-backend-7cn3.onrender.com/vendor/booking/update-status \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bookingId": "BK123456",
+    "vendorId": "693129888a756180b1d3c6fc",
+    "status": "accepted"
+  }'
+```
+
+**Response:**
+```json
+{
+  "ok": true,
+  "message": "Booking accepted successfully",
+  "booking": {
+    "bookingId": "BK123456",
+    "status": "accepted",
+    "otpStart": "6384"
+  }
+}
+```
+
+> ⚠️ **Note:** When vendor accepts/rejects a booking, the backend **automatically notifies customer backend** at:  
+> `POST https://convenzcusb-backend.onrender.com/api/user/booking/status-update`
+
+---
+
+## 📖 Complete API Documentation
+
+For complete API documentation with all endpoints, request/response examples, and error codes:
+
+👉 **[VENDOR_API_DOCUMENTATION.md](VENDOR_API_DOCUMENTATION.md)**
+
+---
+
+## 🧪 Testing
+
+### Run Automated Test Script
+
+```bash
+# Test production
+./test-vendor-api.sh https://vendor-backend-7cn3.onrender.com
+
+# Test local
+./test-vendor-api.sh http://localhost:3000
+```
+
+### Run Unit Tests
+
+```bash
+npm test
+```
+
+---
+
+## 🏗️ Architecture
+
+### Server-to-Server Communication Flow
+
+```
+┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐
+│                 │        │                 │        │                 │
+│  Customer       │───────▶│  Vendor         │───────▶│  Vendor Mobile  │
+│  Backend        │ Create │  Backend        │  FCM   │  App            │
+│                 │ Booking│                 │  Push  │                 │
+└─────────────────┘        └─────────────────┘        └─────────────────┘
+         ▲                          │                          │
+         │                          │                          │
+         │                          ▼                          │
+         │                  ┌─────────────────┐              │
+         │                  │                 │              │
+         │                  │  MongoDB        │              │
+         │                  │  (Convenz DB)   │              │
+         │                  │                 │              │
+         │                  └─────────────────┘              │
+         │                                                    │
+         │                                                    ▼
+         │                                          ┌─────────────────┐
+         │                                          │  Vendor         │
+         │                                          │  Accept/Reject  │
+         │                                          │                 │
+         │                                          └─────────────────┘
+         │                                                    │
+         │                                                    ▼
+         └────────────────────────────────────────────────────┘
+                        Notify Customer Backend
+                      (with retry: 1s, 2s, 3s)
+```
+
+---
+
+## 🔧 Legacy API Endpoints
+
+### Authentication (Legacy)
 ```json
 {
   "message": "verified",
